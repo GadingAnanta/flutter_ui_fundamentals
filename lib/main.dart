@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap6Page(),
+      home: Tahap7Page(),
     );
   }
 }
@@ -817,6 +817,84 @@ class Tahap6Page extends StatelessWidget {
             const Text(
               'Saat keyboard terbuka, area konten tetap dapat di-scroll.'),
           ],
+        ),
+      ),
+    );
+  }
+}
+// ================= TAHAP 7: Navigator.push() dan Navigator.pop() =================
+
+class Tahap7Page extends StatelessWidget {
+  const Tahap7Page({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 7 - Navigator push/pop')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$studentId - $studentName',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  // push: menambahkan DetailPage di atas HomePage.
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DetailPage()),
+                  );
+                },
+                child: const Text('Buka Detail'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DetailPage extends StatelessWidget {
+  const DetailPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Detail Page')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.info_outline, size: 48),
+              const SizedBox(height: 16),
+              Text(
+                '$studentId - $studentName',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text('Ini screen kedua hasil Navigator.push()'),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                // pop: menghapus screen teratas, kembali ke HomePage.
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Kembali'),
+              ),
+            ],
+          ),
         ),
       ),
     );
