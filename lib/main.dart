@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap2Page(),
+      home: Tahap3Page(),
     );
   }
 }
@@ -322,6 +322,155 @@ class Tahap2Page extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+// ================= TAHAP 3: LayoutBuilder dan Breakpoint =================
+
+class Tahap3Page extends StatelessWidget {
+  const Tahap3Page({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 3 - LayoutBuilder & Breakpoint')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 600) {
+              return const CompactLayout();
+            } else if (constraints.maxWidth < 840) {
+              return const MediumLayout();
+            } else {
+              return const ExpandedLayout();
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+// Widget bantu yang dipakai oleh ketiga layout.
+class LayoutCard extends StatelessWidget {
+  final String kategori;
+  final String visual;
+
+  const LayoutCard({super.key, required this.kategori, required this.visual});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Kategori: $kategori',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(visual),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Compact: satu kartu, isi menumpuk ke bawah.
+class CompactLayout extends StatelessWidget {
+  const CompactLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$studentId - $studentName'),
+        const SizedBox(height: 12),
+        const LayoutCard(
+          kategori: 'Compact (< 600)',
+          visual: 'Satu kartu, isi ditumpuk vertikal.',
+        ),
+      ],
+    );
+  }
+}
+
+// Medium: dua kartu berjajar.
+class MediumLayout extends StatelessWidget {
+  const MediumLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$studentId - $studentName'),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Expanded(
+              child: LayoutCard(
+                kategori: 'Medium (600-839)',
+                visual: 'Dua kartu berjajar, ruang dibagi dua.',
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: LayoutCard(
+                kategori: 'Medium (600-839)',
+                visual: 'Ruang lebar dipakai maximum.',
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// Expanded: tiga kartu berjajar.
+class ExpandedLayout extends StatelessWidget {
+  const ExpandedLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('$studentId - $studentName'),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Expanded(
+              child: LayoutCard(
+                kategori: 'Expanded (>= 840)',
+                visual: 'Tiga kartu berjajar.',
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: LayoutCard(
+                kategori: 'Expanded (>= 840)',
+                visual: 'Ruang dibagi tiga sama besar.',
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: LayoutCard(
+                kategori: 'Expanded (>= 840)',
+                visual: 'Ideal untuk tablet dan desktop.',
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
