@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap3Page(),
+      home: Tahap4Page(),
     );
   }
 }
@@ -471,6 +471,121 @@ class ExpandedLayout extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+// ================= TAHAP 4: Expanded, Flexible, dan Wrap =================
+
+/// Panel bantu untuk Tahap 4 (reusable).
+Widget buildPanel(String judul, String isi, Color warna) {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    color: warna.withValues(alpha: 0.15),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(judul, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text(isi),
+      ],
+    ),
+  );
+}
+
+class Tahap4Page extends StatelessWidget {
+  const Tahap4Page({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Enam skill (ditambah satu) untuk Chip pada Wrap.
+    final List<String> skills = [
+      'Flutter',
+      'Dart',
+      'Responsive UI',
+      'Navigation',
+      'State Management',
+      'JSON',
+      'Git',
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 4 - Expanded, Flexible, Wrap')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$studentId - $studentName'),
+            const SizedBox(height: 16),
+
+            // A. Expanded dengan flex 2:1
+            const Text('A. Expanded(flex: 2) dan Expanded(flex: 1)'),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: buildPanel(
+                      'Panel A', 'flex: 2 (dua pertiga ruang)', Colors.blue),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: buildPanel(
+                      'Panel B', 'flex: 1 (satu pertiga ruang)', Colors.green),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // B. Flexible
+            const Text('B. Flexible (longgar) dibandingkan Expanded (penuh)'),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Flexible(
+                  child: buildPanel(
+                      'Flexible', 'Boleh menyusut sesuai isinya',
+                      Colors.orange),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: buildPanel(
+                      'Expanded', 'Selalu mengisi sisa ruang', Colors.purple),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // C. Wrap
+            const Text('C. Wrap (chip otomatis pindah baris)'),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: skills.map((e) => Chip(label: Text(e))).toList(),
+            ),
+            const SizedBox(height: 24),
+
+            // D. Row biasa sebagai pembanding.
+            const Text('D. Row biasa (pembanding)'),
+            const SizedBox(height: 4),
+            const Text(
+                'Pada layar sempit baris di bawah ini overflow karena tidak ada Expanded atau Wrap.'),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                for (final s in skills)
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.all(8),
+                    color: Colors.red.shade100,
+                    child: Text(s),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
