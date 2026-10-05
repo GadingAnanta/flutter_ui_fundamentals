@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap9Page(),
+      home: AdaptiveShell(),
     );
   }
 }
@@ -1179,6 +1179,181 @@ class _Tahap9PageState extends State<Tahap9Page> {
           );
         },
       ),
+    );
+  }
+}
+// ============ TAHAP 10 & 11: NavigationBar dan NavigationRail adaptif ============
+
+class HomeTabPage extends StatelessWidget {
+  const HomeTabPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          '$studentId - $studentName',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        const Card(
+          child: ListTile(
+            leading: Icon(Icons.home),
+            title: Text('Home'),
+            subtitle: Text('Halaman utama navigasi'),
+          ),
+        ),
+        const Card(
+          child: ListTile(
+            leading: Icon(Icons.school),
+            title: Text('Course Explorer'),
+            subtitle: Text('5 mata kuliah semester 5'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CoursesTabPage extends StatelessWidget {
+  const CoursesTabPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const List<String> courses = [
+      'MOB01 - Git & GitHub',
+      'MOB02 - Dart Fundamentals',
+      'MOB03 - Flutter UI Fundamentals',
+      'MOB04 - Navigation',
+      'MOB05 - State Management',
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          '$studentId - $studentName',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        for (final c in courses)
+          Card(child: ListTile(leading: const Icon(Icons.book), title: Text(c))),
+      ],
+    );
+  }
+}
+
+class ProfileTabPage extends StatelessWidget {
+  const ProfileTabPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        const CircleAvatar(
+          radius: 40,
+          backgroundImage: AssetImage('assets/images/profile.jpg'),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          studentName,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Text(studentId),
+        const Text('Pendidikan Teknologi Informasi - Semester 5'),
+      ],
+    );
+  }
+}
+
+/// Shell navigasi utama. Tahap 10 memakai NavigationBar,
+/// Tahap 11 menambah NavigationRail untuk layar lebar.
+class AdaptiveShell extends StatefulWidget {
+  const AdaptiveShell({super.key});
+
+  @override
+  State<AdaptiveShell> createState() => _AdaptiveShellState();
+}
+
+class _AdaptiveShellState extends State<AdaptiveShell> {
+  // selectedIndex disimpan di state agar tetap sama saat layout berubah.
+  int selectedIndex = 0;
+
+  final List<Widget> pages = const [
+    HomeTabPage(),
+    CoursesTabPage(),
+    ProfileTabPage(),
+  ];
+
+  void _pilih(int index) {
+    setState(() => selectedIndex = index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Expanded: NavigationRail. Compact/Medium: NavigationBar.
+        final bool useRail = constraints.maxWidth >= 840;
+
+        final Widget konten = pages[selectedIndex];
+
+        if (useRail) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Course Explorer')),
+            body: Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: _pilih,
+                  labelType: NavigationRailLabelType.all,
+                  destinations: const [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.school),
+                      label: Text('Courses'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.person),
+                      label: Text('Profile'),
+                    ),
+                  ],
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(child: konten),
+              ],
+            ),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(title: const Text('Course Explorer')),
+          body: konten,
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: selectedIndex,
+            onDestinationSelected: _pilih,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.school),
+                label: 'Courses',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
