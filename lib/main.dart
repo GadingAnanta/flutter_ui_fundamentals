@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DashboardPage(),
+      home: Tahap2Page(),
     );
   }
 }
@@ -223,6 +223,104 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+// ================= TAHAP 1: Layout Tidak Responsif =================
+
+class Tahap1Page extends StatelessWidget {
+  const Tahap1Page({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 1 - Layout Tidak Responsif')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$studentId - $studentName'),
+            const SizedBox(height: 16),
+
+            // A. Ukuran hard-coded, 
+            const Text('A. Width tetap (hard-coded)'),
+            const SizedBox(height: 8),
+            Row(
+              // Row memberi lebar tak terbatas ke child tanpa Expanded,
+              // sehingga width 500 benar-benar dipaksakan dan overflow terlihat.
+              children: [
+                Container(
+                  width: 500,
+                  padding: const EdgeInsets.all(16),
+                  color: Colors.orange.shade100,
+                  child: Text('$studentId - $studentName'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // B. Ukuran menyesuaikan ruang yang tersedia.
+            const Text('B. Lebar menyesuaikan ruang (Expanded)'),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    color: Colors.green.shade100,
+                    child: Text('$studentId - $studentName'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+// ================= TAHAP 2: MediaQuery =================
+
+class Tahap2Page extends StatelessWidget {
+  const Tahap2Page({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Membaca karakteristik layar yang tersedia pada context.
+    final size = MediaQuery.of(context).size;
+    final orientation = MediaQuery.of(context).orientation;
+
+    // Kondisi sederhana sesuai worksheet: width < 600 Compact, selain itu Wide.
+    final String label = size.width < 600 ? 'Compact' : 'Wide';
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 2 - MediaQuery')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$studentId - $studentName'),
+            const SizedBox(height: 16),
+
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Width: ${size.width.toStringAsFixed(0)}'),
+                    Text('Height: ${size.height.toStringAsFixed(0)}'),
+                    Text('Orientation: $orientation'),
+                    Text('Kategori: $label'),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
