@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap7Page(),
+      home: Tahap8Page(),
     );
   }
 }
@@ -895,6 +895,117 @@ class DetailPage extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+// ================= TAHAP 8: Passing Data dari List ke Detail Page =================
+
+class Tahap8Page extends StatefulWidget {
+  const Tahap8Page({super.key});
+
+  @override
+  State<Tahap8Page> createState() => _Tahap8PageState();
+}
+
+class _Tahap8PageState extends State<Tahap8Page> {
+  late Future<Map<String, dynamic>> studentFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    studentFuture = loadStudentData();
+  }
+
+  void _bukaDetail(BuildContext context, Map<String, dynamic> course) {
+    // Data course dikirim melalui constructor CourseDetailPage.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CourseDetailPage(course: course),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 8 - Passing Data')),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: studentFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Gagal memuat data: ${snapshot.error}'));
+          }
+
+          final data = snapshot.data!;
+          final student = data['student'] as Map<String, dynamic>;
+          final courses = data['courses'] as List<dynamic>;
+
+          return ListView(
+            padding: const EdgeInsets.all(12),
+            children: [
+              Text(
+                '${student['name']} - ${student['nim']}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              for (final c in courses)
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.book),
+                    title: Text((c as Map<String, dynamic>)['title'] as String),
+                    subtitle: Text(
+                      '${c['code']} - ${c['credits']} SKS',
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    // Setiap ListTile dapat ditekan.
+                    onTap: () => _bukaDetail(context, c),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Detail page menerima data course melalui constructor.
+class CourseDetailPage extends StatelessWidget {
+  final Map<String, dynamic> course;
+
+  const CourseDetailPage({super.key, required this.course});
+
+  @override
+  Widget build(BuildContext context) {
+    final String status = course['status'] as String;
+
+    return Scaffold(
+      appBar: AppBar(title: Text(course['code'] as String)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              course['title'] as String,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text('Kode: ${course['code']}'),
+            Text('SKS: ${course['credits']}'),
+            Text('Status: $status'),
+            const Divider(height: 32),
+            Text(
+              '$studentId - $studentName',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );
