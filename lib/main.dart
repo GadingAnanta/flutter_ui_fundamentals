@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap5Page(),
+      home: Tahap6Page(),
     );
   }
 }
@@ -734,6 +734,90 @@ class _Tahap5PageState extends State<Tahap5Page> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+// ================= TAHAP 6: Scrollable Content dan Keyboard =================
+
+class Tahap6Page extends StatelessWidget {
+  const Tahap6Page({super.key});
+
+  /// Konten yang sengaja dibuat lebih tinggi dari area yang tersedia.
+  List<Widget> isiKonten() {
+    return [
+      for (int i = 1; i <= 6; i++)
+        Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: ListTile(
+            leading: CircleAvatar(child: Text('$i')),
+            title: Text('Kartu profil $i'),
+            subtitle: const Text('Bagian dari konten yang panjang'),
+          ),
+        ),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 6 - Scrollable Content')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('$studentId - $studentName'),
+            const SizedBox(height: 16),
+
+            // A. Tanpa scroll: kolom dipaksa masuk area 420px.
+            const Text('A. Tanpa scroll (area dibatasi 420 px)'),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 420,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: isiKonten(),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // B. Dengan SingleChildScrollView: konten boleh melebihi area.
+            const Text('B. Dengan SingleChildScrollView (area 420 px)'),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 420,
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: isiKonten(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // C. Uji keyboard: kolom isian berada di bawah lipatan layar.
+            const Text('C. Uji keyboard'),
+            const SizedBox(height: 8),
+            const TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Nama lengkap',
+                helperText: 'Fokus kolom ini untuk membuka keyboard',
+              ),
+            ),
+            const SizedBox(height: 12),
+            const TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Feedback',
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Saat keyboard terbuka, area konten tetap dapat di-scroll.'),
+          ],
+        ),
       ),
     );
   }
