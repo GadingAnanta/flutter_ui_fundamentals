@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap8Page(),
+      home: Tahap9Page(),
     );
   }
 }
@@ -1007,6 +1007,177 @@ class CourseDetailPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+// ================= TAHAP 9: Returning Data dari Screen =================
+
+/// Halaman konfirmasi. Mengirim nilai balik ke halaman sebelumnya.
+class ConfirmPage extends StatelessWidget {
+  final String title;
+
+  const ConfirmPage({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Konfirmasi')),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Jadikan "$title" sebagai favorite?',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            Text('$studentId - $studentName'),
+            const SizedBox(height: 24),
+            // pop dengan nilai true.
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Ya, Favorit'),
+            ),
+            const SizedBox(height: 8),
+            // pop dengan nilai false.
+            OutlinedButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Batal'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Halaman detail yang punya tombol Favorite.
+class CourseDetailFavPage extends StatelessWidget {
+  final Map<String, dynamic> course;
+
+  const CourseDetailFavPage({super.key, required this.course});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(course['code'] as String)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              course['title'] as String,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('SKS: ${course['credits']} - Status: ${course['status']}'),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.star),
+              label: const Text('Pilih Favorite'),
+              onPressed: () async {
+                // push di-await untuk menerima nilai dari ConfirmPage.
+                final bool? disetujui = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ConfirmPage(title: course['title'] as String),
+                  ),
+                );
+                if (!context.mounted) return;
+                // Kembali ke halaman list sambil mengirim nilai.
+                Navigator.pop(context, disetujui == true);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Tahap9Page extends StatefulWidget {
+  const Tahap9Page({super.key});
+
+  @override
+  State<Tahap9Page> createState() => _Tahap9PageState();
+}
+
+class _Tahap9PageState extends State<Tahap9Page> {
+  late Future<Map<String, dynamic>> studentFuture;
+  final List<String> favorit = [];
+
+  @override
+  void initState() {
+    super.initState();
+    studentFuture = loadStudentData();
+  }
+
+  Future<void> _bukaDetail(Map<String, dynamic> course) async {
+    // Menunggu nilai balik dari CourseDetailFavPage.
+    final bool? jadiFavorit = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => CourseDetailFavPage(course: course)),
+    );
+
+    if (!mounted || jadiFavorit != true) return;
+    setState(() => favorit.add(course['code'] as String));
+
+    // SnackBar muncul jika result == true.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${course['code']} masuk favorite. Total: ${favorit.length}',
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 9 - Returning Data')),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: studentFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Gagal memuat data: ${snapshot.error}'));
+          }
+
+          final data = snapshot.data!;
+          final courses = data['courses'] as List<dynamic>;
+
+          return ListView(
+            padding: const EdgeInsets.all(12),
+            children: [
+              Text(
+                '$studentId - $studentName',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text('Favorite: ${favorit.isEmpty ? 'belum ada' : favorit.join(', ')}'),
+              const Divider(),
+              for (final c in courses)
+                Card(
+                  child: ListTile(
+                    leading: Icon(
+                      favorit.contains((c as Map<String, dynamic>)['code'])
+                          ? Icons.star
+                          : Icons.book,
+                    ),
+                    title: Text(c['title'] as String),
+                    subtitle: Text('${c['code']} - ${c['credits']} SKS'),
+                    onTap: () => _bukaDetail(c),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
