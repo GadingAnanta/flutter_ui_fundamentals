@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap4Page(),
+      home: Tahap5Page(),
     );
   }
 }
@@ -585,6 +585,155 @@ class Tahap4Page extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+// ================= TAHAP 5: GridView Responsif =================
+
+/// Jumlah kolom grid berdasarkan lebar yang tersedia.
+int columnsFor(double width) {
+  if (width < 600) return 1;
+  if (width < 840) return 2;
+  return 3;
+}
+
+/// Kartu course untuk GridView (reusable).
+class CourseGridCard extends StatelessWidget {
+  final Map<String, dynamic> course;
+
+  const CourseGridCard({super.key, required this.course});
+
+  @override
+  Widget build(BuildContext context) {
+    final String status = course['status'] as String;
+    final Color color = status == 'done'
+        ? Colors.green
+        : status == 'active'
+            ? Colors.blue
+            : Colors.orange;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  course['code'] as String,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '${course['credits']} SKS',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: Text(
+                course['title'] as String,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              status,
+              style: TextStyle(color: color, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Tahap5Page extends StatefulWidget {
+  const Tahap5Page({super.key});
+
+  @override
+  State<Tahap5Page> createState() => _Tahap5PageState();
+}
+
+class _Tahap5PageState extends State<Tahap5Page> {
+  late Future<Map<String, dynamic>> studentFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    studentFuture = loadStudentData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 5 - GridView Responsif')),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: studentFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Gagal memuat data: ${snapshot.error}'));
+          }
+
+          final data = snapshot.data!;
+          final student = data['student'] as Map<String, dynamic>;
+          final courses = data['courses'] as List<dynamic>;
+
+          return Column(
+            children: [
+              // Header: Nama dan NIM selalu terlihat.
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                color: Colors.blue.shade50,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${student['name']} - ${student['nim']}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('Course Explorer - ${courses.length} mata kuliah'),
+                  ],
+                ),
+              ),
+
+              // Grid responsif: jumlah kolom mengikuti lebar yang tersedia.
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(12),
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columnsFor(constraints.maxWidth),
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 1.8,
+                      ),
+                      itemCount: courses.length,
+                      itemBuilder: (context, index) => CourseGridCard(
+                        course: courses[index] as Map<String, dynamic>,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
