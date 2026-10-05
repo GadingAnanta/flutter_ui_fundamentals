@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AdaptiveShell(),
+      home: InteractionShell(),
     );
   }
 }
@@ -1354,6 +1354,291 @@ class _AdaptiveShellState extends State<AdaptiveShell> {
           ),
         );
       },
+    );
+  }
+}
+// ============ TAHAP 12, 13, 14: Interaksi, Form Validasi, dan Feedback ============
+
+class CourseFavCard extends StatefulWidget {
+  final Map<String, dynamic> course;
+
+  const CourseFavCard({super.key, required this.course});
+
+  @override
+  State<CourseFavCard> createState() => _CourseFavCardState();
+}
+
+class _CourseFavCardState extends State<CourseFavCard> {
+  bool isFavorite = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      // InkWell: efek ripple untuk elemen Material.
+      child: InkWell(
+        onTap: () => setState(() => isFavorite = !isFavorite),
+        // GestureDetector: long press menampilkan informasi.
+        onLongPress: () => showDialog<void>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text(widget.course['code'] as String),
+            content: Text(
+              '${widget.course['title']}\n'
+              'SKS: ${widget.course['credits']}\n'
+              '$studentId - $studentName',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Tutup'),
+              ),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              const Icon(Icons.book),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.course['title'] as String,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text('${widget.course['code']} - ${widget.course['credits']} SKS'),
+                  ],
+                ),
+              ),
+              // Tombol eksplisit untuk favorite.
+              IconButton(
+                onPressed: () => setState(() => isFavorite = !isFavorite),
+                icon: Icon(
+                  isFavorite ? Icons.star : Icons.star_border,
+                  color: isFavorite ? Colors.amber : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FormFeedbackPage extends StatefulWidget {
+  const FormFeedbackPage({super.key});
+
+  @override
+  State<FormFeedbackPage> createState() => _FormFeedbackPageState();
+}
+
+class _FormFeedbackPageState extends State<FormFeedbackPage> {
+  final formKey = GlobalKey<FormState>();
+
+  final TextEditingController namaController =
+      TextEditingController(text: studentName);
+  final TextEditingController nimController =
+      TextEditingController(text: studentId);
+  final TextEditingController komentarController = TextEditingController();
+
+  bool loading = false;
+
+  @override
+  void dispose() {
+    namaController.dispose();
+    nimController.dispose();
+    komentarController.dispose();
+    super.dispose();
+  }
+
+  void _kirim() {
+    // Validasi form sebelum menampilkan hasil.
+    if (!(formKey.currentState?.validate() ?? false)) return;
+
+    // Dialog konfirmasi sebelum aksi penting.
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Konfirmasi'),
+        content: Text('Kirim feedback dari ${nimController.text}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _prosesKirim();
+            },
+            child: const Text('Kirim'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _prosesKirim() async {
+    setState(() => loading = true);
+    await Future<void>.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    setState(() => loading = false);
+
+    // SnackBar setelah form valid.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Feedback dari ${namaController.text} (${nimController.text}) '
+          'berhasil dikirim',
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Form(
+        key: formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '$studentId - $studentName',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+
+            TextFormField(
+              controller: namaController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Nama',
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Nama wajib diisi';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+
+            TextFormField(
+              controller: nimController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'NIM',
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'NIM wajib diisi';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+
+            TextFormField(
+              controller: komentarController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Komentar',
+              ),
+              validator: (value) {
+                if (value == null || value.trim().length < 5) {
+                  return 'Komentar minimal 5 karakter';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Loading feedback.
+            if (loading) ...[
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            ElevatedButton(
+              onPressed: loading ? null : _kirim,
+              child: Text(loading ? 'Mengirim...' : 'Kirim Feedback'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shell yang menggabungkan semua interaksi (Tahap 12, 13, 14).
+class InteractionShell extends StatefulWidget {
+  const InteractionShell({super.key});
+
+  @override
+  State<InteractionShell> createState() => _InteractionShellState();
+}
+
+class _InteractionShellState extends State<InteractionShell> {
+  int selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = <Widget>[
+      _CourseListSection(),
+      const FormFeedbackPage(),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tahap 12-14 Interaksi')),
+      body: pages[selectedIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (i) => setState(() => selectedIndex = i),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.book), label: 'Course'),
+          NavigationDestination(icon: Icon(Icons.edit), label: 'Feedback'),
+        ],
+      ),
+    );
+  }
+}
+
+class _CourseListSection extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> courses = [
+      {'code': 'MOB01', 'title': 'Git & GitHub', 'credits': 2},
+      {'code': 'MOB02', 'title': 'Dart Fundamentals', 'credits': 2},
+      {'code': 'MOB03', 'title': 'Flutter UI Fundamentals', 'credits': 3},
+      {'code': 'MOB04', 'title': 'Navigation', 'credits': 2},
+      {'code': 'MOB05', 'title': 'State Management', 'credits': 3},
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: [
+        Text(
+          '$studentId - $studentName',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        const Text('Tap kartu untuk favorite, long press untuk informasi.'),
+        const SizedBox(height: 12),
+        for (final c in courses) CourseFavCard(course: c),
+      ],
     );
   }
 }
