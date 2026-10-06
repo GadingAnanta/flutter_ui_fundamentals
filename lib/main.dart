@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ExResponsiveShell(),
+      home: DebugLabPage(),
     );
   }
 }
@@ -2397,6 +2397,427 @@ class _ExResponsiveShellState extends State<ExResponsiveShell> {
                   ],
                 ),
         );
+      },
+    );
+  }
+}
+// TAHAP 16: DEBUGGING CHALLENGE 
+ 
+// KASUS A - RenderFlex overflow pada Row dengan teks panjang
+
+
+/// Versi salah: Row tanpa batas lentur. Teks panjang memicu overflow
+/// pada layar sempit karena Row memberikan lebar keras ke child.
+class DbgRowSalah extends StatelessWidget {
+  const DbgRowSalah({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.info),
+        const SizedBox(width: 8),
+        Text('$studentId - $studentName - materi responsive flutter adaptive layout'),
+      ],
+    );
+  }
+}
+
+/// Versi benar: Flexible memberi teks sisa ruang dan ellipsis
+/// mencegah teks meluber melewati batas Row.
+class DbgRowBenar extends StatelessWidget {
+  const DbgRowBenar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.info),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            '$studentId - $studentName - materi responsive flutter adaptive layout',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Alternatif lain: Wrap membuat teks turun ke baris berikutnya.
+class DbgRowWrap extends StatelessWidget {
+  const DbgRowWrap({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      children: [
+        const Icon(Icons.info),
+        Text('$studentId - $studentName - materi responsive flutter adaptive layout'),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------
+// KASUS B - Vertical viewport was given unbounded height
+// ---------------------------------------------------------------
+
+/// Versi salah: ListView langsung di dalam Column tanpa Expanded.
+/// Column memberi tinggi tak terbatas, sedangkan ListView menolak
+/// tinggi tak terbatas -> error unbounded height.
+class DbgListSalah extends StatelessWidget {
+  const DbgListSalah({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text('Kasus B - ListView di dalam Column'),
+        ListView.builder(
+          itemCount: 5,
+          itemBuilder: (context, index) => ListTile(
+            dense: true,
+            leading: const Icon(Icons.list),
+            title: Text('Item $index - $studentId'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Versi benar: bungkus ListView dengan Expanded agar
+/// tinggi viewport-nya bounded oleh Column.
+class DbgListBenar extends StatelessWidget {
+  const DbgListBenar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text('Kasus B - ListView di dalam Column'),
+        Expanded(
+          child: ListView.builder(
+            itemCount: 5,
+            itemBuilder: (context, index) => ListTile(
+              dense: true,
+              leading: const Icon(Icons.list),
+              title: Text('Item $index - $studentId'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------
+// KASUS C - Keyboard overflow
+// ---------------------------------------------------------------
+
+/// Versi benar: SingleChildScrollView membuat konten dapat digulir,
+/// dan Scaffold otomatis memakai resizeToAvoidBottomInset sehingga
+/// area konten menyusut saat keyboard muncul. Field paling bawah
+/// tetap dapat diakses dengan menggulir.
+class DbgFormKeyboard extends StatelessWidget {
+  const DbgFormKeyboard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          const Text(
+            'Kasus C - form di dekat bawah layar',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 200),
+          const TextField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Catatan',
+            ),
+          ),
+          const SizedBox(height: 12),
+          const TextField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Ulasan',
+            ),
+          ),
+          const SizedBox(height: 12),
+          const TextField(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Saran',
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Komentar terkirim')),
+              );
+            },
+            child: const Text('Kirim'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------
+// KASUS D - Navigasi ganda
+// ---------------------------------------------------------------
+
+/// Tombol tekan berulang menumpuk route. Flag [dibuka] mencegah
+/// aksi kedua sampai push pertama selesai.
+class DbgTombolGanda extends StatefulWidget {
+  const DbgTombolGanda({super.key});
+
+  @override
+  State<DbgTombolGanda> createState() => _DbgTombolGandaState();
+}
+
+class _DbgTombolGandaState extends State<DbgTombolGanda> {
+  bool dibuka = false;
+
+  Future<void> _bukaDetail() async {
+    // Guard: aksi kedua diabaikan selama proses masih berjalan.
+    if (dibuka) return;
+    setState(() => dibuka = true);
+
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(title: const Text('Detail Course')),
+          body: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.info, size: 40),
+                const SizedBox(height: 12),
+                Text('$studentId - $studentName'),
+                const SizedBox(height: 8),
+                const Text('Route ini hanya bisa dibuka satu kali.'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Jangan panggil setState setelah widget sudah dilepas.
+    if (!mounted) return;
+    setState(() => dibuka = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            dibuka
+                ? 'Sedang membuka detail...'
+                : 'Tekan tombol beberapa kali dengan cepat',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text('$studentId - $studentName'),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            // Tombol dinonaktifkan selama proses push berjalan.
+            onPressed: dibuka ? null : _bukaDetail,
+            icon: const Icon(Icons.open_in_new),
+            label: Text(dibuka ? 'Membuka...' : 'Buka Detail'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------
+// HALAMAN LABORATORIUM
+// ---------------------------------------------------------------
+
+class DebugLabPage extends StatefulWidget {
+  const DebugLabPage({super.key});
+
+  @override
+  State<DebugLabPage> createState() => _DebugLabPageState();
+}
+
+class _DebugLabPageState extends State<DebugLabPage> {
+  int kasus = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Tahap 16 Debugging Lab'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(92),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (int i = 0; i < 4; i++)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text('Kasus ${String.fromCharCode(65 + i)}'),
+                        selected: kasus == i,
+                        onSelected: (_) => setState(() => kasus = i),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      body: switch (kasus) {
+        // Kasus A: Row dengan teks panjang
+        0 => ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text('Kasus A - RenderFlex overflow pada Row',
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 4),
+              Text('$studentId - $studentName',
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+
+              const Text('Error yang muncul:'),
+              const Text('A RenderFlex overflowed by 120 pixels on the right.'),
+              const SizedBox(height: 16),
+
+              const Text('1) Versi salah (Row biasa, tanpa Flexible):'),
+              const SizedBox(height: 8),
+              const DbgRowSalah(),
+              const SizedBox(height: 16),
+
+              const Text('2) Diperbaiki dengan Expanded:'),
+              const SizedBox(height: 8),
+              const DbgRowBenar(),
+              const SizedBox(height: 16),
+
+              const Text('3) Alternatif lain dengan Wrap:'),
+              const SizedBox(height: 8),
+              const DbgRowWrap(),
+              const SizedBox(height: 16),
+
+              const Text('Kenapa Flexible bekerja:'),
+              const Text(
+                'Row membagi lebar untuk child non-lentur terlebih dahulu '
+                '(Icon 24 + SizedBox 8), lalu sisa lebar diberikan kepada '
+                'Expanded atau Flexible. Karena Text willingly menerima '
+                'lebar yang lebih kecil dari kebutuhan alaminya, tidak ada '
+                'child yang melewati batas dan overflow tidak terjadi.',
+              ),
+              const SizedBox(height: 12),
+              const Text('Perbedaan Expanded dan Flexible:'),
+              const Text(
+                'keduanya sama-sama memberi ruang tersisa, tetapi Expanded '
+                'meminta ruang sebesar mungkin (flex: 1) sedangkan Flexible '
+                'hanya mengambil ukuran wajar anak lalu maksimal sebesar '
+                'ruang tersisa (FlexFit.loose).',
+              ),
+            ],
+          ),
+
+        // Kasus B: unbounded ListView
+        1 => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Kasus B - Vertical viewport was given unbounded height',
+                        style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text('$studentId - $studentName',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    const Text('Error yang muncul:'),
+                    const Text(
+                      'RenderFlex children have non-zero flex but incoming '
+                      'height constraints are unbounded.',
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'ListView adalah scrollable vertikal yang butuh tinggi '
+                      'viewport yang sudah ditentukan. Column hanya memberikan '
+                      'batas longgar pada tinggi sehingga tinggi ListView '
+                      'menjadi tak terbatas dan ditolak.',
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                        'Solusi: bungkus dengan Expanded atau SizedBox(height: ...).'),
+                  ],
+                ),
+              ),
+              const Expanded(child: DbgListBenar()),
+            ],
+          ),
+
+        // Kasus C: keyboard overflow
+        2 => Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.keyboard),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '$studentId - $studentName - ketuk field paling bawah, '
+                        'lalu scroll ke bawah',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Expanded(child: DbgFormKeyboard()),
+            ],
+          ),
+
+        // Kasus D: navigasi ganda
+        _ => Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '$studentId - $studentName - tekan tombol berkali-kali',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Expanded(child: DbgTombolGanda()),
+            ],
+          ),
       },
     );
   }
