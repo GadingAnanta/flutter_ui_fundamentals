@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'services.dart';
 import 'tahap1_local_state.dart';
 import 'tahap2_setstate_problem.dart';
+import 'tahap3_lifting_state.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ExResponsiveShell(),
+      home: Tahap3LiftingStatePage(),
     );
   }
 }

@@ -1,9 +1,9 @@
-// ============================================================
+
 // Praktikum Pemwob - Pertemuan 6
 // Tahap 1: Mengenal Local State dan Shared State
 // Nama : Agus Adrian Satria Ananta
 // NIM  : 2415051066
-// ============================================================
+
 
 import 'package:flutter/material.dart';
 
@@ -18,10 +18,9 @@ class Tahap1LocalStatePage extends StatefulWidget {
 }
 
 class _Tahap1LocalStatePageState extends State<Tahap1LocalStatePage> {
-  // ----------------------------------------------------------
+  
   // LOCAL STATE (ephemeral): hanya dipakai widget ini sendiri.
-  // Cocok dikelola dengan setState(). TIDAK perlu Provider.
-  // ----------------------------------------------------------
+  
   bool _favoriteLokal = false; // favorite sementara milik kartu ini
   bool _detailTerbuka = false; // show/hide detail course
   int _jumlahTap = 0; // nilai sementara, untuk membuktikan rebuild
@@ -108,7 +107,7 @@ class _Tahap1LocalStatePageState extends State<Tahap1LocalStatePage> {
 
           const SizedBox(height: 24),
 
-          // ---------------- IDENTIFIKASI 5 STATE ----------------
+          //  IDENTIFIKASI 5 STATE 
           const Text(
             'Identifikasi 5 State pada Course Explorer',
             style: TextStyle(fontWeight: FontWeight.bold),
