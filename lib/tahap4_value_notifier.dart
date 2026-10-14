@@ -1,10 +1,7 @@
-
 // Praktikum Pemwob - Pertemuan 6
 // Tahap 4: ValueNotifier dan ValueListenableBuilder
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
-
-
 import 'package:flutter/material.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
