@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'services.dart';
-import 'tahap1_local_state.dart';
-import 'tahap2_setstate_problem.dart';
-import 'tahap3_lifting_state.dart';
-import 'tahap4_value_notifier.dart';
-import 'tahap5_change_notifier.dart';
+import 'package:provider/provider.dart';
+import 'course_state.dart';
+import 'tahap6_provider_setup.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    // ChangeNotifierProvider menyediakan CourseState ke seluruh widget tree.
+    ChangeNotifierProvider(
+      create: (_) => CourseState(),
+      child: const MyApp(),
+    ),
+  );
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -20,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap5ChangeNotifierPage(),
+      home: Tahap6ProviderSetupPage(), // sementara
     );
   }
 }
