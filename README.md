@@ -1,17 +1,43 @@
 # flutter_ui_fundamentals
 
-A new Flutter project.
+**Course Explorer v2** — Praktikum Pemrograman Web & Mobile (Pemwob), Pertemuan 6:
+State Management & Mobile Application Architecture.
 
-## Getting Started
+- Nama: Agus Adrian Satria Ananta
+- NIM: 2415051066
+- Kelas: PTI 5 C
 
-This project is a starting point for a Flutter application.
+## Arsitektur & Arah Dependency
 
-A few resources to get you started if this is your first Flutter project:
+```
+Screen / Widget  ->  Provider  ->  Repository  ->  Service / Data Source
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+UI (screens/widgets) **tidak pernah** mengakses `rootBundle`/`jsonDecode` secara
+langsung. Data course dimuat melalui rantai tersebut.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Tanggung Jawab Tiap Folder (`lib/`)
+
+| Folder | Tanggung jawab |
+|---|---|
+| `models/` | Bentuk/struktur data murni (`Course`), termasuk `Course.fromJson`. Tidak tahu UI maupun sumber data. |
+| `services/` | Sumber data: membuka `rootBundle`, `jsonDecode`, mengubahnya menjadi `List<Course>` (`CourseService`). Tidak tahu UI. |
+| `repositories/` | Abstraksi data untuk Provider. Menerima `CourseService`, menyediakan `getCourses()` (`CourseRepository`). |
+| `providers/` | State + business logic (`CourseProvider`): `courses`, `isLoading`, `error`, `favorites`; memanggil repository dan `notifyListeners()`. |
+| `screens/` | Halaman aplikasi: `CourseExplorerShell` (shell responsif), daftar course, favorites, detail, profil. |
+| `widgets/` | Komponen tampilan reusable tanpa state (`CourseCard`, `IdentityBar`). |
+
+## Catatan
+
+- Provider tidak menyimpan `BuildContext` sebagai state.
+- `CourseService` hanya mengurus data (tanpa widget/UI).
+- File `tahap*_*.dart` di `lib/` adalah artefak demo per tahap (bukti praktikum);
+  kode produksi Course Explorer v2 berada di dalam folder `models/`, `services/`,
+  `repositories/`, `providers/`, `screens/`, dan `widgets/`.
+
+## Menjalankan
+
+```bash
+flutter pub get
+flutter run
+```
