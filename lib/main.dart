@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'services.dart';
 import 'package:provider/provider.dart';
-import 'course_state.dart';
-import 'tahap9_service.dart';
+import 'providers/course_provider.dart';
+import 'repositories/course_repository.dart';
+import 'services/course_service.dart';
+import 'tahap11_async_state.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
 
 void main() {
   runApp(
-    // ChangeNotifierProvider menyediakan CourseState ke seluruh widget tree.
+    // Rantai dependency: CourseService -> CourseRepository -> CourseProvider.
     ChangeNotifierProvider(
-      create: (_) => CourseState(),
+      create: (_) => CourseProvider(
+        CourseRepository(CourseService()),
+      ),
       child: const MyApp(),
     ),
   );
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -23,11 +28,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap9ServicePage(), // sementara
+      home: Tahap11AsyncStatePage(), // sementara
     );
   }
 }
-
 // Reusable widget 1: kartu profil 
 class ProfileCard extends StatelessWidget {
   final String name;
