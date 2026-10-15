@@ -1,6 +1,6 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 6
-// Tahap 12: Screen - daftar course (memakai Provider + widget reusable)
+// Tahap 13: Screen - daftar course (+ shared favorites lintas screen)
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -12,6 +12,8 @@ import '../models/course.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
 import '../widgets/identity_bar.dart';
+import 'course_detail_screen.dart';
+import 'favorites_screen.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
@@ -33,13 +35,26 @@ class _CourseListScreenState extends State<CourseListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // watch -> ikut rebuild ketika isLoading / error / courses berubah.
+    // watch -> ikut rebuild ketika isLoading / error / courses / favorites berubah.
     final CourseProvider p = context.watch<CourseProvider>();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Course Explorer'),
         actions: [
+          // Indikator live jumlah favorite (bukti konsistensi lintas screen).
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Center(child: Text('★ ${p.jumlahFavorite}')),
+          ),
+          IconButton(
+            tooltip: 'Favorites',
+            icon: const Icon(Icons.star),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+            ),
+          ),
           IconButton(
             tooltip: 'Muat ulang',
             onPressed: () => context.read<CourseProvider>().loadCourses(),
@@ -96,7 +111,18 @@ class _CourseListScreenState extends State<CourseListScreen> {
         for (final c in courses)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: CourseCard(course: c),
+            child: CourseCard(
+              course: c,
+              isFavorite: p.isFavorite(c.code),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CourseDetailScreen(course: c),
+                ),
+              ),
+              onToggleFavorite: () =>
+                  context.read<CourseProvider>().toggleFavorite(c.code),
+            ),
           ),
       ],
     );
