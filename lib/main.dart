@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'services.dart';
 import 'package:provider/provider.dart';
 import 'course_state.dart';
-import 'tahap8_model_course.dart';
+import 'tahap9_service.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap8ModelCoursePage(), // sementara
+      home: Tahap9ServicePage(), // sementara
     );
   }
 }
