@@ -1,6 +1,6 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 6
-// Tahap 13: Screen - daftar course (+ shared favorites lintas screen)
+// Tahap 14: Isi tab "Courses" (body-only, dipakai di dalam shell)
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -11,12 +11,7 @@ import 'package:provider/provider.dart';
 import '../models/course.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
-import '../widgets/identity_bar.dart';
 import 'course_detail_screen.dart';
-import 'favorites_screen.dart';
-
-const String studentName = 'Agus Adrian Satria Ananta';
-const String studentId = '2415051066';
 
 class CourseListScreen extends StatefulWidget {
   const CourseListScreen({super.key});
@@ -35,46 +30,8 @@ class _CourseListScreenState extends State<CourseListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // watch -> ikut rebuild ketika isLoading / error / courses / favorites berubah.
     final CourseProvider p = context.watch<CourseProvider>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Course Explorer'),
-        actions: [
-          // Indikator live jumlah favorite (bukti konsistensi lintas screen).
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Center(child: Text('★ ${p.jumlahFavorite}')),
-          ),
-          IconButton(
-            tooltip: 'Favorites',
-            icon: const Icon(Icons.star),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-            ),
-          ),
-          IconButton(
-            tooltip: 'Muat ulang',
-            onPressed: () => context.read<CourseProvider>().loadCourses(),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: IdentityBar(name: studentName, nim: studentId),
-          ),
-          Expanded(child: _buildKondisi(context, p)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKondisi(BuildContext context, CourseProvider p) {
     // 1) LOADING
     if (p.isLoading) {
       return const Center(child: CircularProgressIndicator());

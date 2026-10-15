@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
 import 'services/course_service.dart';
-import 'screens/course_list_screen.dart';
+import 'screens/course_explorer_shell.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: CourseListScreen(), // aplikasi Course Explorer
+      home: CourseExplorerShell(), // Course Explorer v2
     );
   }
 }
