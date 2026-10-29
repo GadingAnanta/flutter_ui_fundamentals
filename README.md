@@ -7,6 +7,33 @@ State Management & Mobile Application Architecture.
 - NIM: 2415051066
 - Kelas: PTI 5 C
 
+## Dokumentasi REST API Endpoint (Pertemuan 7 - Tahap 1)
+
+Pada tahap awal praktikum REST API, aplikasi menggunakan REST endpoint untuk resource `courses`:
+
+- **Base URL / Endpoint**: `https://jsonplaceholder.typicode.com/posts` (atau endpoint latihan `/courses`)
+- **HTTP Method**: `GET`
+- **Expected Status Code**: `200 OK`
+- **Resource**: `/courses`
+- **Representasi JSON Resource (Course)**:
+  ```json
+  {
+    "id": 1,
+    "code": "MOB01",
+    "title": "Git & GitHub",
+    "credits": 2,
+    "status": "active"
+  }
+  ```
+- **Field JSON Utama**:
+  1. `id` (int): Identifier unik resource.
+  2. `code` (String): Kode mata kuliah (contoh: "MOB01").
+  3. `title` (String): Judul / nama mata kuliah (contoh: "Git & GitHub").
+  4. `credits` (int): Beban SKS mata kuliah (contoh: 2).
+  5. `status` (String): Status keikutsertaan course (`planned`, `active`, `done`).
+
+---
+
 ## Arsitektur & Arah Dependency
 
 ```
