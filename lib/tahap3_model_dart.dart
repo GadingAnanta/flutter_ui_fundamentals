@@ -1,10 +1,7 @@
-// ============================================================
 // Praktikum Pemwob - Pertemuan 7
 // Tahap 3: Model Dart (Course.fromJson() dan toJson())
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
-// ============================================================
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

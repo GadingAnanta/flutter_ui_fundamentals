@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'models/course.dart';
 import 'repositories/course_repository.dart';
-import 'services/course_service.dart';
+import 'services/course_api_service.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
@@ -19,7 +19,7 @@ class Tahap10RepositoryPage extends StatefulWidget {
 
 class _Tahap10RepositoryPageState extends State<Tahap10RepositoryPage> {
   // UI memanggil REPOSITORY. Repository yang mengurus service.
-  final CourseRepository _repository = CourseRepository(CourseService());
+  final CourseRepository _repository = CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com/posts'));
   late Future<List<Course>> _future;
 
   @override

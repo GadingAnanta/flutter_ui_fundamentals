@@ -3,11 +3,12 @@ import 'services.dart';
 import 'package:provider/provider.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
-import 'services/course_service.dart';
+import 'services/course_api_service.dart';
 // ignore: unused_import
 import 'screens/course_explorer_shell.dart';
 // ignore: unused_import
 import 'tahap2_http_get.dart';
+// ignore: unused_import
 import 'tahap3_model_dart.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
@@ -18,7 +19,7 @@ void main() {
     // Rantai dependency: CourseService -> CourseRepository -> CourseProvider.
     ChangeNotifierProvider(
       create: (_) => CourseProvider(
-        CourseRepository(CourseService()),
+        CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com/posts')),
       ),
       child: const MyApp(),
     ),
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap3ModelDartPage(), // Pertemuan 7 - Tahap 3: Model Dart
+      home: CourseExplorerShell(), // Pertemuan 7 - Tahap 4: Course Explorer Shell via Service
     );
   }
 }
@@ -2838,5 +2839,7 @@ class _DebugLabPageState extends State<DebugLabPage> {
     );
   }
 }
+
+
 
 

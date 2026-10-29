@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'models/course.dart';
-import 'services/course_service.dart';
+import 'services/course_api_service.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
@@ -18,7 +18,7 @@ class Tahap9ServicePage extends StatefulWidget {
 
 class _Tahap9ServicePageState extends State<Tahap9ServicePage> {
   // UI memakai SERVICE, bukan rootBundle langsung.
-  final CourseService _service = CourseService();
+  final CourseApiService _service = CourseApiService('https://jsonplaceholder.typicode.com/posts');
   late Future<List<Course>> _future;
 
   @override
@@ -28,7 +28,7 @@ class _Tahap9ServicePageState extends State<Tahap9ServicePage> {
   }
 
   Future<List<Course>> _muatData() async {
-    final List<Course> courses = await _service.loadCourses();
+    final List<Course> courses = await _service.getCourses();
 
     // Uji sementara via debugPrint (lihat panel Debug Console).
     for (final c in courses) {
