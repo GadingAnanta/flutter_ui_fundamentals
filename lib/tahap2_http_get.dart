@@ -1,9 +1,7 @@
-// ============================================================
 // Praktikum Pemwob - Pertemuan 7
 // Tahap 2: HTTP GET dari Flutter
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
-// ============================================================
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -12,8 +10,6 @@ import 'widgets/identity_bar.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
-
-// Konstanta apiUrl sesuai endpoint latihan
 const String apiUrl = 'https://jsonplaceholder.typicode.com/posts';
 
 class Tahap2HttpGetPage extends StatefulWidget {
@@ -24,7 +20,6 @@ class Tahap2HttpGetPage extends StatefulWidget {
 }
 
 class _Tahap2HttpGetPageState extends State<Tahap2HttpGetPage> {
-  // Flag endpoint untuk simulasi error (langkah 4 worksheet)
   bool _useWrongUrl = false;
   late Future<List<dynamic>> _futureCourses;
 

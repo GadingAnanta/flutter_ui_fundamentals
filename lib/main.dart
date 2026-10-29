@@ -6,7 +6,9 @@ import 'repositories/course_repository.dart';
 import 'services/course_service.dart';
 // ignore: unused_import
 import 'screens/course_explorer_shell.dart';
+// ignore: unused_import
 import 'tahap2_http_get.dart';
+import 'tahap3_model_dart.dart';
 
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
@@ -30,7 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Tahap2HttpGetPage(), // Pertemuan 7 - Tahap 2: HTTP GET
+      home: Tahap3ModelDartPage(), // Pertemuan 7 - Tahap 3: Model Dart
     );
   }
 }
@@ -2836,4 +2838,5 @@ class _DebugLabPageState extends State<DebugLabPage> {
     );
   }
 }
+
 

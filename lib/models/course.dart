@@ -1,30 +1,32 @@
 // ============================================================
-// Praktikum Pemwob - Pertemuan 6
-// Tahap 8: Model Course + parsing JSON
+// Praktikum Pemwob - Pertemuan 7
+// Tahap 3: Model Course + fromJson & toJson
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
 
 class Course {
+  final int? id;
   final String code;
   final String title;
   final int credits;
-  final String status; // done | active | planned
+  final String status;
 
   const Course({
+    this.id,
     required this.code,
     required this.title,
     required this.credits,
-    required this.status,
+    this.status = 'planned',
   });
 
-  /// Label status yang ramah dibaca manusia.
+  /// Label status ramah pengguna untuk UI
   String get statusLabel {
     switch (status) {
       case 'done':
         return 'Selesai';
       case 'active':
-        return 'Sedang Berjalan';
+        return 'Aktif';
       case 'planned':
         return 'Direncanakan';
       default:
@@ -32,23 +34,40 @@ class Course {
     }
   }
 
-  /// Mengubah Map hasil jsonDecode menjadi object Course.
+  /// Mengubah Map hasil jsonDecode menjadi objek Course typed
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
-      code: json['code'] as String,
-      title: json['title'] as String,
-      credits: (json['credits'] as num).toInt(),
-      status: (json['status'] ?? 'planned') as String,
+      id: json['id'] as int?,
+      // Fallback toleran jika menggunakan API latihan umum seperti JSONPlaceholder
+      code: (json['code'] as String?) ?? 'MOB0${json['id'] ?? 1}',
+      title: (json['title'] as String?) ?? 'Untitled Course',
+      credits: (json['credits'] as num?)?.toInt() ?? 2,
+      status: (json['status'] as String?) ?? 'planned',
     );
   }
 
-  /// Kebalikannya: object Course menjadi Map (dipakai bila perlu kirim/simpan).
-  Map<String, dynamic> toJson() {
-    return {
-      'code': code,
-      'title': title,
-      'credits': credits,
-      'status': status,
-    };
+  /// Mengubah objek Course menjadi Map JSON untuk POST/PUT ke API / database
+  Map<String, dynamic> toJson() => {
+    'code': code,
+    'title': title,
+    'credits': credits,
+    'status': status,
+  };
+
+  /// Salin objek dengan perubahan atribut tertentu (opsional)
+  Course copyWith({
+    int? id,
+    String? code,
+    String? title,
+    int? credits,
+    String? status,
+  }) {
+    return Course(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      title: title ?? this.title,
+      credits: credits ?? this.credits,
+      status: status ?? this.status,
+    );
   }
 }
