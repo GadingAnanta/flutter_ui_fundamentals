@@ -1,10 +1,7 @@
-// ============================================================
 // Praktikum Pemwob - Pertemuan 7
 // Tahap 4: Repository menggunakan CourseApiService
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
-// ============================================================
-
 import '../models/course.dart';
 import '../services/course_api_service.dart';
 

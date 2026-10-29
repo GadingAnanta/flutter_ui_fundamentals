@@ -19,8 +19,8 @@ void main() {
     // Rantai dependency: CourseService -> CourseRepository -> CourseProvider.
     ChangeNotifierProvider(
       create: (_) => CourseProvider(
-        CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com/posts')),
-      ),
+        CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com/salah_404')),
+      )..loadCourses(),
       child: const MyApp(),
     ),
   );
@@ -2839,6 +2839,8 @@ class _DebugLabPageState extends State<DebugLabPage> {
     );
   }
 }
+
+
 
 
 

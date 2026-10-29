@@ -1,9 +1,8 @@
-// ============================================================
 // Praktikum Pemwob - Pertemuan 7
 // Tahap 4: Memindahkan HTTP ke Service Layer
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
-// ============================================================
+
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -15,7 +14,6 @@ class CourseApiService {
 
   Uri _buildUri([String path = '']) {
     final cleanBase = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
-    // Jika baseUrl sudah mengandung resource seperti /posts atau /courses
     if (cleanBase.endsWith('/courses') || cleanBase.endsWith('/posts')) {
       return path.isEmpty ? Uri.parse(cleanBase) : Uri.parse('$cleanBase/$path');
     }

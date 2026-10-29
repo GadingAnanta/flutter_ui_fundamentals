@@ -1,6 +1,6 @@
 // ============================================================
-// Praktikum Pemwob - Pertemuan 6
-// Tahap 14: Isi tab "Courses" (body-only, dipakai di dalam shell)
+// Praktikum Pemwob - Pertemuan 7
+// Tahap 5: Loading, Success, Empty, dan Error State
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../models/course.dart';
 import '../providers/course_provider.dart';
 import '../widgets/course_card.dart';
+import '../widgets/error_view.dart';
 import 'course_detail_screen.dart';
 
 class CourseListScreen extends StatefulWidget {
@@ -24,44 +25,43 @@ class _CourseListScreenState extends State<CourseListScreen> {
   @override
   void initState() {
     super.initState();
-    // read (bukan watch) -> memicu aksi tanpa ikut rebuild saat setup.
-    context.read<CourseProvider>().loadCourses();
+    // Panggil loadCourses saat widget diinisialisasi (bukan dari build)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<CourseProvider>().loadCourses();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final CourseProvider p = context.watch<CourseProvider>();
 
-    // 1) LOADING
+    // 1) LOADING STATE
     if (p.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // 2) ERROR
+    // 2) ERROR STATE
     if (p.error != null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-            const SizedBox(height: 8),
-            Text('Gagal memuat:\n${p.error}', textAlign: TextAlign.center),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => context.read<CourseProvider>().loadCourses(),
-              child: const Text('Coba lagi'),
-            ),
-          ],
+      return ErrorView(
+        message: p.error!,
+        onRetry: () => context.read<CourseProvider>().loadCourses(),
+      );
+    }
+
+    // 3) EMPTY STATE
+    final List<Course> courses = p.courses;
+    if (courses.isEmpty) {
+      return const Center(
+        child: Text(
+          'Data course belum tersedia',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
         ),
       );
     }
 
-    // 3) SUCCESS
-    final List<Course> courses = p.courses;
-    if (courses.isEmpty) {
-      return const Center(child: Text('Belum ada data course.'));
-    }
-
+    // 4) SUCCESS STATE
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
