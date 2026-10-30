@@ -1,6 +1,6 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 7: CourseProvider Update Course
+// Tahap 8: CourseProvider Delete Course
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -76,6 +76,21 @@ class CourseProvider extends ChangeNotifier {
       if (updatedIdx != -1) {
         courses[updatedIdx] = course;
       }
+      notifyListeners();
+    } catch (e) {
+      error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> deleteCourse(int id, String code) async {
+    try {
+      await repository.deleteCourse(id);
+      // Langsung hapus dari list lokal agar UI responsif
+      courses.removeWhere((c) => c.id == id || c.code == code);
+      // Hapus dari favorites jika ada
+      favorites.remove(code);
       notifyListeners();
     } catch (e) {
       error = e.toString();

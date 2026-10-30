@@ -1,5 +1,5 @@
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 7: HTTP PUT/PATCH: Memperbarui Resource
+// Tahap 8: HTTP DELETE: Menghapus Resource
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 import 'dart:convert';
@@ -57,6 +57,13 @@ class CourseApiService {
     );
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception('Gagal memperbarui course (HTTP ${response.statusCode})');
+    }
+  }
+
+  Future<void> deleteCourse(int id) async {
+    final response = await http.delete(_buildUri('$id'));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Gagal menghapus course (HTTP ${response.statusCode})');
     }
   }
 }
