@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 
+# Secret / environment (Tahap 17: jangan pernah commit secret)
+.env
+.env.*
+*.env
+!.env.example
+
 # IntelliJ related
 *.iml
 *.ipr
