@@ -1,10 +1,7 @@
-// ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 6: HTTP POST: Membuat Resource Baru
+// Tahap 7: HTTP PUT/PATCH: Memperbarui Resource
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
-// ============================================================
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/course.dart';
@@ -50,5 +47,16 @@ class CourseApiService {
       );
     }
     throw Exception('Gagal membuat course (HTTP ${response.statusCode})');
+  }
+
+  Future<void> updateCourse(int id, Course course) async {
+    final response = await http.put(
+      _buildUri('$id'),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode(course.toJson()),
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('Gagal memperbarui course (HTTP ${response.statusCode})');
+    }
   }
 }

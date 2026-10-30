@@ -1,6 +1,6 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 6: Repository Create Course
+// Tahap 7: Repository Update Course
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -19,5 +19,9 @@ class CourseRepository {
 
   Future<Course> createCourse(Course course) {
     return service.createCourse(course);
+  }
+
+  Future<void> updateCourse(int id, Course course) {
+    return service.updateCourse(id, course);
   }
 }

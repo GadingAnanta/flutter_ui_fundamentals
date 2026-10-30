@@ -1,6 +1,6 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 6: CourseProvider Create Course
+// Tahap 7: CourseProvider Update Course
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -52,9 +52,29 @@ class CourseProvider extends ChangeNotifier {
     try {
       final newCourse = await repository.createCourse(course);
       await loadCourses();
-      // Fallback untuk mock API agar data baru langsung tampak di UI
       if (!courses.any((c) => c.code == newCourse.code)) {
         courses.insert(0, newCourse);
+      }
+      notifyListeners();
+    } catch (e) {
+      error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> updateCourse(int id, Course course) async {
+    try {
+      await repository.updateCourse(id, course);
+      // Perbarui data lokal jika menggunakan mock API latihan
+      final index = courses.indexWhere((c) => c.id == id || c.code == course.code);
+      if (index != -1) {
+        courses[index] = course;
+      }
+      await loadCourses();
+      final updatedIdx = courses.indexWhere((c) => c.code == course.code);
+      if (updatedIdx != -1) {
+        courses[updatedIdx] = course;
       }
       notifyListeners();
     } catch (e) {

@@ -1,6 +1,6 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 6: Form Tambah Course (Create Resource via HTTP POST)
+// Tahap 7: Form Tambah & Edit Course (HTTP PUT / PATCH)
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -68,15 +68,24 @@ class _CourseFormPageState extends State<CourseFormPage> {
         status: _selectedStatus,
       );
 
-      // Panggil createCourse melalui CourseProvider
-      await context.read<CourseProvider>().createCourse(course);
+      // Guard: Panggil create atau update melalui Provider
+      if (_isEditMode) {
+        final targetId = widget.initialCourse!.id ?? 1;
+        await context.read<CourseProvider>().updateCourse(targetId, course);
+      } else {
+        await context.read<CourseProvider>().createCourse(course);
+      }
 
-      // Guard: Cek apakah widget masih terpasang pada tree sebelum pakai context
+      // Guard: Cek apakah widget masih terpasang pada tree sebelum memakai context
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Course "${course.title}" berhasil disimpan!'),
+          content: Text(
+            _isEditMode
+                ? 'Course "${course.title}" berhasil diperbarui!'
+                : 'Course "${course.title}" berhasil disimpan!',
+          ),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
         ),
@@ -116,10 +125,10 @@ class _CourseFormPageState extends State<CourseFormPage> {
               const IdentityBar(name: studentName, nim: studentId),
               const SizedBox(height: 20),
 
-              // 1. Kode Course
+              // 1. Kode Course (Dibuat read-only saat mode edit karena merupakan kunci favorite)
               TextFormField(
                 controller: _codeController,
-                readOnly: _isEditMode, // Kunci kode dibuat readonly pada mode edit
+                readOnly: _isEditMode,
                 decoration: InputDecoration(
                   labelText: 'Kode Course *',
                   hintText: 'Contoh: MOB01',
@@ -127,6 +136,9 @@ class _CourseFormPageState extends State<CourseFormPage> {
                   border: const OutlineInputBorder(),
                   filled: _isEditMode,
                   fillColor: _isEditMode ? Colors.grey.shade100 : null,
+                  helperText: _isEditMode
+                      ? 'Kode course dikunci (read-only) sebagai kunci relasi'
+                      : null,
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -140,11 +152,11 @@ class _CourseFormPageState extends State<CourseFormPage> {
               // 2. Judul Course
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Judul / Nama Course *',
                   hintText: 'Contoh: Pemrograman Mobile Lanjut',
-                  prefixIcon: const Icon(Icons.book),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.book),
+                  border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -159,11 +171,11 @@ class _CourseFormPageState extends State<CourseFormPage> {
               TextFormField(
                 controller: _creditsController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Jumlah SKS *',
                   hintText: 'Contoh: 2 atau 3',
-                  prefixIcon: const Icon(Icons.numbers),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.numbers),
+                  border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -181,10 +193,10 @@ class _CourseFormPageState extends State<CourseFormPage> {
               // 4. Status
               DropdownButtonFormField<String>(
                 initialValue: _selectedStatus,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Status Course',
-                  prefixIcon: const Icon(Icons.flag),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.flag),
+                  border: OutlineInputBorder(),
                 ),
                 items: const [
                   DropdownMenuItem(
@@ -208,12 +220,12 @@ class _CourseFormPageState extends State<CourseFormPage> {
               ),
               const SizedBox(height: 24),
 
-              // Tombol Simpan dengan Guard isSaving (mencegah submit ganda)
+              // Tombol Simpan / Perbarui dengan Guard _isSaving
               ElevatedButton.icon(
                 onPressed: _isSaving ? null : _handleSave,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  backgroundColor: Colors.teal.shade700,
+                  backgroundColor: _isEditMode ? Colors.blue.shade700 : Colors.teal.shade700,
                   foregroundColor: Colors.white,
                 ),
                 icon: _isSaving
@@ -225,7 +237,7 @@ class _CourseFormPageState extends State<CourseFormPage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Icon(Icons.save),
+                    : Icon(_isEditMode ? Icons.update : Icons.save),
                 label: Text(
                   _isSaving
                       ? 'Menyimpan...'
