@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'config/supabase_config.dart';
 import 'services.dart';
 import 'package:provider/provider.dart';
 import 'providers/course_provider.dart';
@@ -17,7 +19,23 @@ const String studentId = '2415051066';
 // Base URL API latihan (tanpa /courses).
 const String apiBaseUrl = 'https://jsonplaceholder.typicode.com/posts';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Tahap 10: inisialisasi Supabase sebelum runApp().
+  if (isSupabaseConfigured) {
+    await Supabase.initialize(
+      url: supabaseUrl,
+      publishableKey: supabasePublishableKey,
+    );
+    debugPrint('Supabase client siap: $supabaseUrl');
+  } else {
+    debugPrint(
+      'Supabase belum dikonfigurasi. Isi lib/config/supabase_config.dart '
+      'dengan Project URL dan anon key.',
+    );
+  }
+
   // Tahap 9: rakit DataSource -> Repository -> Provider.
   // Hanya baris ini yang berubah ketika sumber data diganti.
   final repository = CourseRepository(CourseApiService(apiBaseUrl));
