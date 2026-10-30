@@ -5,7 +5,7 @@ import 'services.dart';
 import 'package:provider/provider.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
-import 'services/course_api_service.dart';
+import 'services/course_supabase_service.dart';
 // ignore: unused_import
 import 'screens/course_explorer_shell.dart';
 // ignore: unused_import
@@ -36,9 +36,9 @@ Future<void> main() async {
     );
   }
 
-  // Tahap 9: rakit DataSource -> Repository -> Provider.
-  // Hanya baris ini yang berubah ketika sumber data diganti.
-  final repository = CourseRepository(CourseApiService(apiBaseUrl));
+  // Tahap 12: sumber data diganti ke Supabase.
+  // Hanya satu baris ini yang berubah (berkat kontrak CourseDataSource).
+  final repository = CourseRepository(CourseSupabaseService());
 
   runApp(
     ChangeNotifierProvider(
