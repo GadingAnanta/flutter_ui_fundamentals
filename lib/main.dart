@@ -14,13 +14,17 @@ import 'tahap3_model_dart.dart';
 const String studentName = 'Agus Adrian Satria Ananta';
 const String studentId = '2415051066';
 
+// Base URL API latihan (tanpa /courses).
+const String apiBaseUrl = 'https://jsonplaceholder.typicode.com/posts';
+
 void main() {
+  // Tahap 9: rakit DataSource -> Repository -> Provider.
+  // Hanya baris ini yang berubah ketika sumber data diganti.
+  final repository = CourseRepository(CourseApiService(apiBaseUrl));
+
   runApp(
-    // Rantai dependency: CourseService -> CourseRepository -> CourseProvider.
     ChangeNotifierProvider(
-      create: (_) => CourseProvider(
-        CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com/posts')),
-      )..loadCourses(),
+      create: (_) => CourseProvider(repository)..loadCourses(),
       child: const MyApp(),
     ),
   );

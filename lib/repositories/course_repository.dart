@@ -1,31 +1,29 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 8: Repository Delete Course
+// Tahap 9: Repository Pattern untuk REST API
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
+//
+// Repository menjadi kontrak yang dipakai state layer (Provider).
+// Provider tidak tahu apakah dataSource berupa REST API, Supabase,
+// maupun cache lokal.
 
 import '../models/course.dart';
-import '../services/course_api_service.dart';
+import '../services/course_data_source.dart';
 
 class CourseRepository {
-  final CourseApiService service;
+  final CourseDataSource dataSource;
 
-  CourseRepository(this.service);
+  CourseRepository(this.dataSource);
 
-  Future<List<Course>> getCourses() {
-    return service.getCourses();
-  }
+  Future<List<Course>> getCourses() => dataSource.getCourses();
 
-  Future<Course> createCourse(Course course) {
-    return service.createCourse(course);
-  }
+  Future<Course> createCourse(Course course) =>
+      dataSource.createCourse(course);
 
-  Future<void> updateCourse(int id, Course course) {
-    return service.updateCourse(id, course);
-  }
+  Future<void> updateCourse(int id, Course course) =>
+      dataSource.updateCourse(id, course);
 
-  Future<void> deleteCourse(int id) {
-    return service.deleteCourse(id);
-  }
+  Future<void> deleteCourse(int id) => dataSource.deleteCourse(id);
 }

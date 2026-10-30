@@ -1,12 +1,14 @@
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 8: HTTP DELETE: Menghapus Resource
+// Tahap 9: Repository Pattern untuk REST API
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/course.dart';
+import 'course_data_source.dart';
 
-class CourseApiService {
+/// Implementasi CourseDataSource yang mengambil data dari REST API.
+class CourseApiService implements CourseDataSource {
   CourseApiService(this.baseUrl);
   final String baseUrl;
 
@@ -18,6 +20,7 @@ class CourseApiService {
     return path.isEmpty ? Uri.parse('$cleanBase/courses') : Uri.parse('$cleanBase/courses/$path');
   }
 
+  @override
   Future<List<Course>> getCourses() async {
     final response = await http.get(_buildUri());
     if (response.statusCode != 200) {
@@ -29,6 +32,7 @@ class CourseApiService {
         .toList();
   }
 
+  @override
   Future<Course> createCourse(Course course) async {
     final response = await http.post(
       _buildUri(),
@@ -49,6 +53,7 @@ class CourseApiService {
     throw Exception('Gagal membuat course (HTTP ${response.statusCode})');
   }
 
+  @override
   Future<void> updateCourse(int id, Course course) async {
     final response = await http.put(
       _buildUri('$id'),
@@ -60,6 +65,7 @@ class CourseApiService {
     }
   }
 
+  @override
   Future<void> deleteCourse(int id) async {
     final response = await http.delete(_buildUri('$id'));
     if (response.statusCode < 200 || response.statusCode >= 300) {
