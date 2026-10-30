@@ -1,14 +1,14 @@
 // ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 12: SELECT - Membaca Data dari Database Supabase
+// Tahap 13: INSERT - Menambah Data ke Database Supabase
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
 //
 // CourseSupabaseService mengimplementasikan kontrak CourseDataSource
 // (Tahap 9) dengan sumber data tabel `courses` di Supabase.
-// Method yang belum dikerjakan (INSERT/UPDATE/DELETE) masih berupa
-// stub UnimplementedError agar kelas tetap dapat dikompilasi.
+// SELECT (Tahap 12) dan INSERT (Tahap 13) sudah aktif;
+// UPDATE/DELETE masih stub sampai Tahap 14-15.
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,11 +30,24 @@ class CourseSupabaseService implements CourseDataSource {
   }
 
   // ------------------------------------------------------------
-  // Tahap 13-15: belum diimplementasikan.
+  // Tahap 13: INSERT course baru ke tabel `courses`.
+  // `.select().single()` mengembalikan baris yang baru dibuat
+  // (termasuk id) supaya repository & provider menerima Course utuh.
   // ------------------------------------------------------------
   @override
-  Future<Course> createCourse(Course course) => throw UnimplementedError();
+  Future<Course> createCourse(Course course) async {
+    final row = await supabase
+        .from('courses')
+        .insert(course.toJson())
+        .select()
+        .single();
 
+    return Course.fromJson(row);
+  }
+
+  // ------------------------------------------------------------
+  // Tahap 14-15: belum diimplementasikan.
+  // ------------------------------------------------------------
   @override
   Future<void> updateCourse(int id, Course course) =>
       throw UnimplementedError();
