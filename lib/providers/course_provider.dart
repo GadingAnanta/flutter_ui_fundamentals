@@ -1,6 +1,6 @@
 // ============================================================
-// Praktikum Pemwob - Pertemuan 6
-// Tahap 11: Provider untuk Async State (loading / success / error)
+// Praktikum Pemwob - Pertemuan 7
+// Tahap 6: CourseProvider Create Course
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
 // ============================================================
@@ -19,21 +19,17 @@ class CourseProvider extends ChangeNotifier {
   String? error;
 
   // ---- Shared favorites (application state) ----
-  // Dipakai oleh lebih dari satu screen -> satu Provider = source of truth.
   final Set<String> favorites = <String>{};
 
   bool isFavorite(String code) => favorites.contains(code);
 
   void toggleFavorite(String code) {
-    favorites.contains(code)
-        ? favorites.remove(code)
-        : favorites.add(code);
+    favorites.contains(code) ? favorites.remove(code) : favorites.add(code);
     notifyListeners();
   }
 
   int get jumlahFavorite => favorites.length;
 
-  // Daftar course yang sedang difavoritkan (dipakai FavoritesScreen).
   List<Course> get favoriteCourses =>
       courses.where((c) => isFavorite(c.code)).toList();
 
@@ -49,6 +45,22 @@ class CourseProvider extends ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> createCourse(Course course) async {
+    try {
+      final newCourse = await repository.createCourse(course);
+      await loadCourses();
+      // Fallback untuk mock API agar data baru langsung tampak di UI
+      if (!courses.any((c) => c.code == newCourse.code)) {
+        courses.insert(0, newCourse);
+      }
+      notifyListeners();
+    } catch (e) {
+      error = e.toString();
+      notifyListeners();
+      rethrow;
     }
   }
 }

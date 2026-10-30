@@ -19,7 +19,7 @@ void main() {
     // Rantai dependency: CourseService -> CourseRepository -> CourseProvider.
     ChangeNotifierProvider(
       create: (_) => CourseProvider(
-        CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com/salah_404')),
+        CourseRepository(CourseApiService('https://jsonplaceholder.typicode.com/posts')),
       )..loadCourses(),
       child: const MyApp(),
     ),

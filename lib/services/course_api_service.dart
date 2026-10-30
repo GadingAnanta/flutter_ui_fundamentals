@@ -1,8 +1,9 @@
+// ============================================================
 // Praktikum Pemwob - Pertemuan 7
-// Tahap 4: Memindahkan HTTP ke Service Layer
+// Tahap 6: HTTP POST: Membuat Resource Baru
 // Nama  : Agus Adrian Satria Ananta
 // NIM   : 2415051066
-
+// ============================================================
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -30,5 +31,24 @@ class CourseApiService {
         .map((e) => Course.fromJson(e as Map<String, dynamic>))
         .toList();
   }
-}
 
+  Future<Course> createCourse(Course course) async {
+    final response = await http.post(
+      _buildUri(),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode(course.toJson()),
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final Map<String, dynamic> data =
+          jsonDecode(response.body) as Map<String, dynamic>;
+      return Course(
+        id: data['id'] as int?,
+        code: (data['code'] as String?) ?? course.code,
+        title: (data['title'] as String?) ?? course.title,
+        credits: (data['credits'] as num?)?.toInt() ?? course.credits,
+        status: (data['status'] as String?) ?? course.status,
+      );
+    }
+    throw Exception('Gagal membuat course (HTTP ${response.statusCode})');
+  }
+}
