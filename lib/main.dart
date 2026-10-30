@@ -5,6 +5,7 @@ import 'services.dart';
 import 'package:provider/provider.dart';
 import 'providers/course_provider.dart';
 import 'repositories/course_repository.dart';
+import 'services/course_data_source.dart';
 import 'services/course_supabase_service.dart';
 // ignore: unused_import
 import 'screens/course_explorer_shell.dart';
@@ -36,9 +37,12 @@ Future<void> main() async {
     );
   }
 
-  // Tahap 12: sumber data diganti ke Supabase.
-  // Hanya satu baris ini yang berubah (berkat kontrak CourseDataSource).
-  final repository = CourseRepository(CourseSupabaseService());
+  // Tahap 16: pemilihan data source aktif hanya di file ini.
+  // Berpindah antara REST dan Supabase cukup mengubah satu baris berikut:
+  //   Supabase : CourseSupabaseService()
+  //   REST     : CourseApiService(apiBaseUrl)
+  final CourseDataSource dataSource = CourseSupabaseService();
+  final repository = CourseRepository(dataSource);
 
   runApp(
     ChangeNotifierProvider(

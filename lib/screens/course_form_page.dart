@@ -70,7 +70,12 @@ class _CourseFormPageState extends State<CourseFormPage> {
 
       // Guard: Panggil create atau update melalui Provider
       if (_isEditMode) {
-        final targetId = widget.initialCourse!.id ?? 1;
+        // Tahap 16: id wajib ada untuk UPDATE. Tanpa guard ini, fallback
+        // ke id 1 akan menimpa course lain saat id bernilai null.
+        final int? targetId = widget.initialCourse!.id;
+        if (targetId == null) {
+          throw StateError('Course tanpa id tidak dapat diperbarui.');
+        }
         await context.read<CourseProvider>().updateCourse(targetId, course);
       } else {
         await context.read<CourseProvider>().createCourse(course);
