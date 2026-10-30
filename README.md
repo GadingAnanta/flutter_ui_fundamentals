@@ -34,6 +34,36 @@ Pada tahap awal praktikum REST API, aplikasi menggunakan REST endpoint untuk res
 
 ---
 
+## Database Supabase (Pertemuan 7 - Tahap 11)
+
+Skema tabel `courses` pada Supabase (PostgreSQL):
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| `id` | `bigint` identity | Primary key |
+| `code` | `text` | Kode course (mis. `MOB01`), dipakai sebagai kunci favorites |
+| `title` | `text` | Judul course |
+| `credits` | `int` | Jumlah SKS |
+| `status` | `text` | `planned` / `active` / `done` (CHECK constraint) |
+| `created_at` | `timestamptz` | Default `now()` |
+
+Script SQL lengkap (tabel + CHECK constraint + 3 data awal + RLS policy):
+
+```
+supabase/migrations/0001_create_courses.sql
+```
+
+Nama kolom sengaja dibuat sama dengan key pada `Course.fromJson()` / `toJson()`
+(`code`, `title`, `credits`, `status`) agar mapping JSON tidak perlu diubah.
+
+**Keamanan.** RLS diaktifkan. Policy yang dipakai bersifat permisif (role `anon`
+boleh select/insert/update/delete tanpa autentikasi) dan **hanya untuk
+lingkungan laboratorium/praktikum**, bukan pola produksi. Kunci yang dipakai
+aplikasi hanya *publishable/anon key*; `service_role` key tidak pernah
+disimpan di aplikasi.
+
+---
+
 ## Arsitektur & Arah Dependency
 
 ```
@@ -48,8 +78,8 @@ langsung. Data course dimuat melalui rantai tersebut.
 | Folder | Tanggung jawab |
 |---|---|
 | `models/` | Bentuk/struktur data murni (`Course`), termasuk `Course.fromJson`. Tidak tahu UI maupun sumber data. |
-| `services/` | Sumber data: membuka `rootBundle`, `jsonDecode`, mengubahnya menjadi `List<Course>` (`CourseService`). Tidak tahu UI. |
-| `repositories/` | Abstraksi data untuk Provider. Menerima `CourseService`, menyediakan `getCourses()` (`CourseRepository`). |
+| `services/` | Sumber data dan kontraknya: `CourseDataSource` (abstrak) + `CourseApiService` (implementasi REST). Tidak tahu UI. |
+| `repositories/` | Abstraksi data untuk Provider. Menerima `CourseDataSource`, menyediakan CRUD (`CourseRepository`). |
 | `providers/` | State + business logic (`CourseProvider`): `courses`, `isLoading`, `error`, `favorites`; memanggil repository dan `notifyListeners()`. |
 | `screens/` | Halaman aplikasi: `CourseExplorerShell` (shell responsif), daftar course, favorites, detail, profil. |
 | `widgets/` | Komponen tampilan reusable tanpa state (`CourseCard`, `IdentityBar`). |
@@ -57,7 +87,7 @@ langsung. Data course dimuat melalui rantai tersebut.
 ## Catatan
 
 - Provider tidak menyimpan `BuildContext` sebagai state.
-- `CourseService` hanya mengurus data (tanpa widget/UI).
+- `CourseApiService` hanya mengurus data (tanpa widget/UI).
 - File `tahap*_*.dart` di `lib/` adalah artefak demo per tahap (bukti praktikum);
   kode produksi Course Explorer v2 berada di dalam folder `models/`, `services/`,
   `repositories/`, `providers/`, `screens/`, dan `widgets/`.
